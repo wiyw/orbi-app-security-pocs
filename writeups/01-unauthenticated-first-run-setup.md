@@ -59,5 +59,14 @@ The transport is plain HTTP, so the PIN and cookie are also sniffable by anyone 
 position on the LAN — a risk the project documents but accepts. Practical precondition: the
 target must be in the unconfigured state, so the window is right after installation.
 
+## Fully-local use with an already-configured device
+
+**No.** `/api/setup` is a one-shot endpoint: once `pin_hash` exists it returns
+`409 Already set up` (`orbi/web.py:300-301`). A locally reachable instance that has already been
+set up cannot be re-enrolled, so this PoC has no effect no matter where the request comes from.
+The bug is only triggerable during the first-run window before a PIN exists. Even then the normal
+vector is LAN (loopback from the host itself would also work), but an already-configured target is
+out of scope.
+
 **Fix direction:** bind to loopback until setup is complete; require a one-time token printed in
 the host UI or tray; apply the PIN throttle to setup attempts as well.

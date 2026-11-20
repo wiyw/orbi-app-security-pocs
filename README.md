@@ -17,7 +17,22 @@ Reproductions for the five findings in the `inspectormamba/orbi-app` security re
 ## Writeups
 
 Each writeup explains the root cause and data flow, how the PoC reproduces it, what an attacker
-gains, and a fix direction. See [`writeups/`](writeups/).
+gains, a fix direction, and whether it is usable with only local access to an already-configured
+device. See [`writeups/`](writeups/).
+
+### Fully-local use (already-configured device)
+
+| # | Works fully locally? | Reason |
+|---|---|---|
+| 1 | No | `/api/setup` returns `409 Already set up` once a PIN exists; first-run only. |
+| 2 | No | Needs L2 ARP spoofing plus a brief router outage; loopback has no ARP entry. |
+| 3 | Yes | Stop the app, import a self-sealed ZIP with `--force`; replaces `orbi.db` and `settings.json` (PIN, router password, secrets). |
+| 4 | Yes | Same-user macOS process reads `settings.json` + Keychain secrets with no prompt; works *because* the device is set up. |
+| 5 | No | Install-time only; nothing re-triggers it on a configured app. |
+
+Bottom line: with only local access to a configured device, **#3 gives control of the app's
+configuration and credentials**, **#4 gives read access to all stored secrets**, and #1/#2/#5
+need outside conditions (unconfigured instance, LAN position, or install-time access).
 
 ## Setup
 

@@ -55,6 +55,16 @@ not cross OS-user boundaries and it does not help a remote attacker on its own �
 malware or an untrusted helper already runs in the user's session, or when combined with an
 arbitrary-file-read issue.
 
+## Fully-local use with an already-configured device
+
+**Yes — this is the cleanest fully-local finding.** With same-user access to the configured Mac,
+no network position, router contact, victim action, or install-time access is needed: read
+`settings.json` for the `keychain:<acct>` references, then call
+`security find-generic-password -s OrbiControl -a <acct> -w` for each. Because the items were
+written with `-A`, there is no prompt or ACL grant. This works precisely *because* the device is
+already set up and has secrets stored. The limitation is scope: same macOS user only — it does not
+cross OS-user boundaries, and it recovers secrets rather than altering settings.
+
 **Fix direction:** scope the ACL to the app binary with `security add-generic-password -T
 /path/to/app` (and `-T ""` only where a prompt is acceptable), or use the Data Protection keychain
 with an app access group. Keep only the reference in settings, as the app already does.

@@ -53,6 +53,26 @@ the victim importing the file with the correct passphrase. A `--force` import re
 data dir after making a backup, but the backup is made from the *current* machine, not from the
 attacker's entries.
 
+## Fully-local use with an already-configured device
+
+**Yes — local access is enough, with one local prerequisite: the app must be stopped.** `import_()`
+checks `osdep.single_instance()` (`orbi/migrate.py:157-158`) and refuses while Orbi Control is
+running, so stop it first. With filesystem access you can then:
+
+- Seal a payload with a passphrase **you choose** (the `seal()` primitive is public), put any
+  `orbi.db`, `router-backups/*` and `kev_ids.json` entries alongside it, and call
+  `import_(..., force=True)`. `import_()` unseals with your passphrase and writes the attacker-
+  chosen `orbi.db` **and** `settings.json` (`:168-192`). Because the sealed settings are yours,
+  you can set a new `pin_hash`, router password and secrets as well — this is effectively a full
+  local takeover, not just DB tampering.
+- If instead you found a *real* move file whose passphrase you do **not** know, the HMAC gap itself
+  is what helps: replace only `orbi.db` and leave `sealed.bin` byte-for-byte intact, then have the
+  file imported with the owner's passphrase. No network position, ARP spoofing or router contact
+  is involved in either case — everything happens on disk.
+
+So PoC 3 works entirely locally; the only "outside" step is the owner supplying their passphrase
+in the second variant, which the first variant avoids entirely by using your own.
+
 **Fix direction:** include a SHA-256 for every ZIP entry in the manifest and cover that manifest
 with the HMAC; verify all entries before writing anything to disk; or use an authenticated archive
 format end to end.

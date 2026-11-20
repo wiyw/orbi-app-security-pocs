@@ -44,6 +44,14 @@ mirror, or a compromised proxy — gets arbitrary code execution as the user run
 before any project hashes are verified. The installer runs without `sudo`, so the impact is the
 user's account: home directory, Keychain items available to that user, and the installed app.
 
+## Fully-local use with an already-configured device
+
+**No.** This is an install-time exposure only. The unpinned `pip install --upgrade pip` line runs
+once, inside `install-macos.sh`, before the app is set up. On an already-configured device that
+path has completed; there is no local action against the running app that re-triggers it.
+Exploiting it requires control of the upstream pip artifact or distribution channel at install
+time, which is outside manipulation by definition.
+
 **Fix direction:** pin pip itself (version and hash) or use the OS-provided pip; install all
 dependencies in a single `--require-hashes` invocation; and pin transitive dependencies such as
 the pyobjc packages so the hash mode can actually complete.

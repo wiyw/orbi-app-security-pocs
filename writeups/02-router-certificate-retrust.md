@@ -71,6 +71,16 @@ The app only notifies *after* trusting, and the notification says the same hardw
 confirmed — misleading the owner. The initial TOFU acceptance at first use is a related, documented
 limitation: an attacker present before first setup receives the password even without this bug.
 
+## Fully-local use with an already-configured device
+
+**No.** The PoC runs locally, but the *attack* does not: reaching the auto-trust path requires
+L2 adjacency to spoof ARP for the router IP and the ability to briefly drop the real router's
+TCP 443/80 to set `_router_dropped` (`orbi/monitor.py:271-288,722-766`). None of that is available
+to a process that only has local access to the configured host. Pointing `router_host` at
+`127.0.0.1` cannot trigger it either — loopback has no ARP entry, so `gateway_mac()` returns
+`None` and the trust check exits early (`:745-748`). With local access you could edit the pin
+directly in config, but that bypasses this vulnerability rather than exploiting it.
+
 **Fix direction:** identify the router by its public key or a signature over the certificate, not
 by subject strings; treat ARP table entries as unauthenticated hints, not identity proof;
 require several consistent probes and explicit user confirmation for unasked restarts; alert
