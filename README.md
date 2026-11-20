@@ -6,13 +6,18 @@ Reproductions for the five findings in the `inspectormamba/orbi-app` security re
 > app owner's own lab. PoC 1 changes the target's PIN — run it only against a disposable,
 > unconfigured instance.
 
-| # | Severity | Finding | Script |
-|---|----------|---------|--------|
-| 1 | High | Unauthenticated first-run PIN setup from the LAN | `poc1_lan_setup_takeover.py` |
-| 2 | High | Router cert pin silently replaced by a LAN impersonator | `poc2_cert_pin_retrust.py` |
-| 3 | Medium | Move-file HMAC leaves `orbi.db`/backups unauthenticated | `poc3_move_file_tamper.py` |
-| 4 | Medium | macOS Keychain secrets stored with a wildcard (`-A`) ACL | `poc4_keychain_permissive_acl.py` |
-| 5 | Low | macOS installer upgrades pip without a pin or hash | `poc5_unpinned_pip_upgrade.py` |
+| # | Severity | Finding | Script | Writeup |
+|---|----------|---------|--------|---------|
+| 1 | High | Unauthenticated first-run PIN setup from the LAN | `poc1_lan_setup_takeover.py` | [01](writeups/01-unauthenticated-first-run-setup.md) |
+| 2 | High | Router cert pin silently replaced by a LAN impersonator | `poc2_cert_pin_retrust.py` | [02](writeups/02-router-certificate-retrust.md) |
+| 3 | Medium | Move-file HMAC leaves `orbi.db`/backups unauthenticated | `poc3_move_file_tamper.py` | [03](writeups/03-move-file-hmac-gap.md) |
+| 4 | Medium | macOS Keychain secrets stored with a wildcard (`-A`) ACL | `poc4_keychain_permissive_acl.py` | [04](writeups/04-keychain-wildcard-acl.md) |
+| 5 | Low | macOS installer upgrades pip without a pin or hash | `poc5_unpinned_pip_upgrade.py` | [05](writeups/05-unpinned-pip-upgrade.md) |
+
+## Writeups
+
+Each writeup explains the root cause and data flow, how the PoC reproduces it, what an attacker
+gains, and a fix direction. See [`writeups/`](writeups/).
 
 ## Setup
 
