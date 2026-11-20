@@ -1,7 +1,7 @@
 # Writeup 3 — Move-file HMAC leaves the database and backups unauthenticated
 
 **Finding:** CWE-345 (Insufficient Verification of Data Authenticity) / CWE-347, Medium
-**PoC:** `poc3_move_file_tamper.py`
+**PoC:** `tests/poc3_move_file_tamper.py` · live: `live/poc3_live_move_file_takeover.py`
 
 ## How the vulnerability works
 

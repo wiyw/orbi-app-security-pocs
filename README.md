@@ -3,16 +3,24 @@
 Reproductions for the five findings in the `inspectormamba/orbi-app` security review.
 
 > **Authorized testing only.** These target one specific build of Orbi Control and are for the
-> app owner's own lab. PoC 1 changes the target's PIN — run it only against a disposable,
-> unconfigured instance.
+> app owner's own lab. The `live/` scripts change real machine state — use them only on your own
+> configured device, after reading the matching writeup. `tests/` are harmless lab reproductions.
 
-| # | Severity | Finding | Script | Writeup |
-|---|----------|---------|--------|---------|
-| 1 | High | Unauthenticated first-run PIN setup from the LAN | `poc1_lan_setup_takeover.py` | [01](writeups/01-unauthenticated-first-run-setup.md) |
-| 2 | High | Router cert pin silently replaced by a LAN impersonator | `poc2_cert_pin_retrust.py` | [02](writeups/02-router-certificate-retrust.md) |
-| 3 | Medium | Move-file HMAC leaves `orbi.db`/backups unauthenticated | `poc3_move_file_tamper.py` | [03](writeups/03-move-file-hmac-gap.md) |
-| 4 | Medium | macOS Keychain secrets stored with a wildcard (`-A`) ACL | `poc4_keychain_permissive_acl.py` | [04](writeups/04-keychain-wildcard-acl.md) |
-| 5 | Low | macOS installer upgrades pip without a pin or hash | `poc5_unpinned_pip_upgrade.py` | [05](writeups/05-unpinned-pip-upgrade.md) |
+| # | Severity | Finding | Lab test (`tests/`) | Live (`live/`) | Writeup |
+|---|----------|---------|---------------------|----------------|---------|
+| 1 | High | Unauthenticated first-run PIN setup from the LAN | `poc1_lan_setup_takeover.py` | `poc1_live_setup_takeover.py` | [01](writeups/01-unauthenticated-first-run-setup.md) |
+| 2 | High | Router cert pin silently replaced by a LAN impersonator | `poc2_cert_pin_retrust.py` | `poc2_live_cert_retrust.py` | [02](writeups/02-router-certificate-retrust.md) |
+| 3 | Medium | Move-file HMAC leaves `orbi.db`/backups unauthenticated | `poc3_move_file_tamper.py` | `poc3_live_move_file_takeover.py` | [03](writeups/03-move-file-hmac-gap.md) |
+| 4 | Medium | macOS Keychain secrets stored with a wildcard (`-A`) ACL | `poc4_keychain_permissive_acl.py` | `poc4_live_keychain_dump.py` | [04](writeups/04-keychain-wildcard-acl.md) |
+| 5 | Low | macOS installer upgrades pip without a pin or hash | `poc5_unpinned_pip_upgrade.py` | `poc5_live_unpinned_pip.py` | [05](writeups/05-unpinned-pip-upgrade.md) |
+
+## Two folders
+
+- **`tests/`** — self-contained reproductions. Temp dirs, mocks and a local HTTP listener; they
+  never change a configured machine. Safe to run in a lab. See [`tests/README.md`](tests/README.md).
+- **`live/`** — versions that operate on an actual machine: the real HTTP endpoint, real
+  `settings.json`, real Keychain, real data dir, real installer. Every mutating script requires
+  `--confirm` and makes a backup first. See [`live/README.md`](live/README.md).
 
 ## Writeups
 
@@ -36,7 +44,8 @@ need outside conditions (unconfigured instance, LAN position, or install-time ac
 
 ## Setup
 
-PoCs 2–5 import the application code, so they need an Orbi Control checkout and its dependencies:
+The `tests/` and `live/` scripts import the application code, so they need an Orbi Control checkout
+and its dependencies:
 
 ```sh
 git clone https://github.com/inspectormamba/orbi-app.git ../orbi-app
@@ -45,23 +54,22 @@ python3 -m venv .venv
 export ORBI_PATH="$PWD/../orbi-app"
 ```
 
-Every script also accepts `--orbi-path`. PoC 1 needs only Python's standard library.
+Every script also accepts `--orbi-path`. The lab PoC 1 needs only Python's standard library.
+PoC 1 in either folder talks to a real HTTP endpoint; it needs no app imports.
 
 ## Running
 
 ```sh
-# PoC 1 — live, unconfigured instance on your LAN
-.venv/bin/python poc1_lan_setup_takeover.py http://192.168.1.50:8470
+# Harmless lab reproductions (2-5), no network, no root, no real router
+.venv/bin/python tests/verify_all.py
 
-# PoCs 2–5 — self-contained, no network, no root, no real router
-.venv/bin/python poc2_cert_pin_retrust.py
-.venv/bin/python poc3_move_file_tamper.py
-.venv/bin/python poc4_keychain_permissive_acl.py
-.venv/bin/python poc5_unpinned_pip_upgrade.py
-
-# or all self-contained ones at once
-.venv/bin/python verify_all.py
+# Live scripts — require --confirm, operate on this machine / target
+.venv/bin/python live/poc1_live_setup_takeover.py http://192.168.1.50:8470 --confirm
+.venv/bin/python live/poc2_live_cert_retrust.py --confirm --serve
+.venv/bin/python live/poc3_live_move_file_takeover.py --confirm --force
+.venv/bin/python live/poc4_live_keychain_dump.py --confirm --mask
+.venv/bin/python live/poc5_live_unpinned_pip.py --confirm
 ```
 
 Each script prints the vulnerable source location, the attacker-controlled input, and the
-observed state. It exits `0` only when the vulnerability reproduced, and non-zero otherwise.
+observed state. The `tests/` scripts exit `0` only when the vulnerability reproduced.

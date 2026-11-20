@@ -1,7 +1,7 @@
 # Writeup 5 — macOS installer upgrades pip without a pin or hash
 
 **Finding:** CWE-494 (Download of Code Without Integrity Check), Low
-**PoC:** `poc5_unpinned_pip_upgrade.py`
+**PoC:** `tests/poc5_unpinned_pip_upgrade.py` · live: `live/poc5_live_unpinned_pip.py`
 
 ## How the vulnerability works
 

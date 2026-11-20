@@ -1,7 +1,7 @@
 # Writeup 2 — Router certificate pin silently replaced by a LAN impersonator
 
 **Finding:** CWE-295 (Improper Certificate Validation), High
-**PoC:** `poc2_cert_pin_retrust.py`
+**PoC:** `tests/poc2_cert_pin_retrust.py` · live: `live/poc2_live_cert_retrust.py`
 
 ## How the vulnerability works
 

@@ -1,7 +1,7 @@
 # Writeup 1 — Unauthenticated first-run PIN setup
 
 **Finding:** CWE-306 (Missing Authentication for Critical Function) / CWE-1188, High
-**PoC:** `poc1_lan_setup_takeover.py`
+**PoC:** `tests/poc1_lan_setup_takeover.py` · live: `live/poc1_live_setup_takeover.py`
 
 ## How the vulnerability works
 

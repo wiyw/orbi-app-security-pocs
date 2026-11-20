@@ -1,7 +1,7 @@
 # Writeup 4 — macOS Keychain secrets stored with a wildcard ACL
 
 **Finding:** CWE-732 (Incorrect Permission Assignment) / CWE-522, Medium
-**PoC:** `poc4_keychain_permissive_acl.py`
+**PoC:** `tests/poc4_keychain_permissive_acl.py` · live: `live/poc4_live_keychain_dump.py`
 
 ## How the vulnerability works
 
